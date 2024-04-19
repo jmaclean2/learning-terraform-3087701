@@ -61,12 +61,16 @@ module "alb" {
   ]
 
   target_groups = [
-    ex-instance = {
       name_prefix      = "web-"
       protocol         = "HTTP"
       port             = 80
       target_type      = "instance"
-    }
+      targets = {
+        my_target = {
+          target_id = aws_instance.web.id
+          port = 80
+        }
+      }
   ]
 
   tags = {
