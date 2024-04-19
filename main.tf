@@ -45,34 +45,31 @@ resource "aws_instance" "web" {
 }
 
 module "alb" {
-  source = "terraform-aws-modules/alb/aws"
+  source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name    = "web-alb"
-  vpc_id  = module.web_vpc.vpc_id
-  subnets = module.web_vpc.public_subnets
-  security_groups = [aws_security_group.web.id]
+  name = "web-alb"
 
-  http_tcp_listeners = [
-    {
-      port = 80      
-      protocol         = "HTTP"
-      target_group_index = 0
-    }
-  ]
+  load_balancer_type = "application"
+
+  vpc_id             = module.web_vpc.vpc_id
+  subnets            = module.web_vpc.public_subnets
+  security_groups    = [aws_security_group.web.id]
 
   target_groups = [
     {
-      name_prefix      = "web-"
-      protocol         = "HTTP"
-      port             = 80
+      name_prefix      = "blog-"
+      backend_protocol = "HTTP"
+      backend_port     = 80
       target_type      = "instance"
-      targets = {
-        my_target = {
-          target_id = aws_instance.web.id
-          port = 80
-        }
-      }
+    }
+  ]
+
+  http_tcp_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
     }
   ]
 
