@@ -61,6 +61,7 @@ module "alb" {
   ]
 
   target_groups = [
+    {
       name_prefix      = "web-"
       protocol         = "HTTP"
       port             = 80
@@ -71,6 +72,7 @@ module "alb" {
           port = 80
         }
       }
+    }
   ]
 
   tags = {
