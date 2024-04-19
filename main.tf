@@ -44,6 +44,36 @@ resource "aws_instance" "web" {
   }
 }
 
+module "alb" {
+  source = "terraform-aws-modules/alb/aws"
+
+  name    = "web-alb"
+  vpc_id  = module.web_vpc.vpc_id
+  subnets = module.web_vpc.public_subnets
+  security_group = aws_security_group.web.id
+
+  http_tcp_listeners = {
+    {
+      port = 80      
+      protocol         = "HTTP"
+      target_group_index = 0
+    }
+  }
+
+  target_groups = {
+    ex-instance = {
+      name_prefix      = "web-"
+      protocol         = "HTTP"
+      port             = 80
+      target_type      = "instance"
+    }
+  }
+
+  tags = {
+    Environment = "dev"
+  }
+}
+
 resource "aws_security_group" "web" {
   name = "web"
   description = "Jamie web"
