@@ -46,6 +46,7 @@ resource "aws_instance" "web" {
 
 module "alb" {
   source = "terraform-aws-modules/alb/aws"
+  version = "~> 6.0"
 
   name    = "web-alb"
   vpc_id  = module.web_vpc.vpc_id
