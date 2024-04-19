@@ -36,7 +36,7 @@ module "web_alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 6.0"
 
-  name = "web-alb"
+  name = "ja-alb"
 
   load_balancer_type = "application"
 
