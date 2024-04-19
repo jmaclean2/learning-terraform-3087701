@@ -3,7 +3,7 @@ data "aws_ami" "app_ami" {
 
   filter {
     name   = "name"
-    values = ["bitnami-tomcat-*-x86_64-hvm-ebs-nami"]
+    values = [var.ami_filter.name]
   }
 
   filter {
@@ -11,7 +11,7 @@ data "aws_ami" "app_ami" {
     values = ["hvm"]
   }
 
-  owners = ["979382823631"] # Bitnami
+  owners = ["var.ami_filter.owner"] 
 }
 data "aws_vpc" "default" {
   default = true
@@ -20,15 +20,15 @@ data "aws_vpc" "default" {
 module "web_vpc" {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "dev"
-  cidr = "10.0.0.0/16"
+  name = var.environment.name
+  cidr = "${var.environment.network_prefix}.0.0/16"
 
   azs             = ["us-west-2a", "us-west-2b", "us-west-2c"]
   public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
 
   tags = {
     Terraform = "true"
-    Environment = "dev"
+    Environment = var.environment.name
   }
 }
 
@@ -62,7 +62,7 @@ module "web_alb" {
   ]
 
   tags = {
-    Environment = "dev"
+    Environment = var.environment.name
   }
 }
 
@@ -72,8 +72,8 @@ module "blog_autoscaling" {
 
   name = "web"
 
-  min_size            = 1
-  max_size            = 2
+  min_size            = var.asg_min
+  max_size            = var.asg_max
   vpc_zone_identifier = module.web_vpc.public_subnets
   target_group_arns   = module.web_alb.target_group_arns
   security_groups     = [aws_security_group.web.id]
